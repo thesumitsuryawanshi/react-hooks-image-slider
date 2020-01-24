@@ -4,7 +4,7 @@ A React Hooks rebuild of the previous slider, which utilized class based compone
 
 ## Demo
 
-[React Hooks Image Slider](https://dzuz14.github.io/React-Hooks-Image-Slider/)
+[React Hooks Image Slider](https://dzuz14.github.io/react-hooks-image-slider/)
 
 ## To Do
 
