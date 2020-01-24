@@ -1,3 +1,12 @@
 # React Hooks Image Slider
 
-Rebuilt the prior version that used class based components/redux.
+A React Hooks rebuild of the previous slider, which utilized class based components & redux.
+
+## Demo
+
+[React Hooks Image Slider](https://dzuz14.github.io/React-Hooks-Image-Slider/)
+
+## To Do
+
+- Fix transition jankiness
+- Handle resizes of the browser
