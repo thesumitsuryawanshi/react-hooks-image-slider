@@ -1,151 +1,122 @@
 /** @jsx jsx */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { css, jsx } from '@emotion/core'
-import styled from '@emotion/styled'
+import SliderContent from './SliderContent'
+import Slide from './Slide'
 import Arrow from './Arrow'
-import Dot from './Dot'
-
-const StyledSlider = styled.div`
-  position: relative;
-  height: 100vh;
-  width: 100vw;
-  margin: 0 auto;
-  overflow: hidden;
-  white-space: nowrap;
-`
-const SliderContent = styled.div`
-  transform: translateX(-${props => props.translate}px);
-  transition: transform ease-out 0.45s;
-  height: 100%;
-  width: 100%;
-  display: flex;
-`
-
-const Dots = styled.div`
-  position: absolute;
-  bottom: 25px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
+import Dots from './Dots'
 
 /**
  * @function Slider
  */
 const Slider = props => {
+  const getWidth = () => window.innerWidth
+  const contentRef = useRef()
+
   const [state, setState] = useState({
     activeIndex: 0,
-    translate: 0,
-    slideWidth: window.innerWidth,
-    imagesCache: props.images,
-    images: props.images
+    translate: getWidth(),
+    transition: 0.45,
+    images: [
+      props.images[props.images.length - 1],
+      ...props.images,
+      props.images[0]
+    ]
   })
-  const { activeIndex, translate, slideWidth, images, imagesCache } = state
 
-  /**
-   * @todo
-   */
-  // useEffect(() => {
-  //   if (images.length < imagesCache.length) {
-  //     setState({ ...state, images: imagesCache })
-  //   }
-  // }, [images])
+  const { activeIndex, translate, images, transition } = state
+
+  /** smoothTransition */
+  const smoothTransition = () => {
+    if (activeIndex === 0 && translate > getWidth())
+      return setState({ ...state, transition: 0, translate: getWidth() })
+
+    if (activeIndex === 0 && translate === 0) {
+      return setState({
+        ...state,
+        transition: 0,
+        translate: getWidth() * props.images.length - 1
+      })
+    }
+  }
+
+  useEffect(() => {
+    contentRef.current.addEventListener('transitionend', smoothTransition)
+    return () =>
+      contentRef.current.removeEventListener('transitionend', smoothTransition)
+  }, [activeIndex])
+
+  useEffect(() => {
+    if (transition === 0) {
+      setState({ ...state, transition: 0.45 })
+    }
+  }, [transition])
 
   /** nextSlide */
   const nextSlide = () => {
-    const { activeIndex, images } = state
+    const next = (activeIndex + 2) * getWidth()
 
-    const nextIndex = activeIndex + 1
-    const lastIndex = images.length - 1
-
-    const newIndex = activeIndex === lastIndex ? 0 : nextIndex
-    const newTranslate =
-      activeIndex === lastIndex ? 0 : nextIndex * window.innerWidth
+    if (activeIndex === props.images.length - 1) {
+      return setState({
+        ...state,
+        activeIndex: 0,
+        translate: next
+      })
+    }
 
     setState({
       ...state,
-      activeIndex: newIndex,
-      translate: newTranslate
+      activeIndex: activeIndex + 1,
+      translate: next
     })
   }
 
   /** prevSlide */
   const prevSlide = () => {
-    const { activeIndex, images } = state
-    const prevIndex = activeIndex - 1
-    const lastIndex = images.length - 1
+    const prev = activeIndex * getWidth()
 
-    const newIndex = activeIndex === 0 ? lastIndex : prevIndex
-    const newTranslate =
-      activeIndex === 0
-        ? lastIndex * window.innerWidth
-        : prevIndex * window.innerWidth
+    if (activeIndex === 0) {
+      return setState({
+        ...state,
+        activeIndex: props.images.length - 1,
+        translate: prev
+      })
+    }
 
     setState({
       ...state,
-      activeIndex: newIndex,
-      translate: newTranslate
-    })
-  }
-
-  /** handleLongTransition */
-  // const handleLongTransition = () => {
-  //   const { activeIndex, images } = state
-  //   const lastIndex = images.length - 1
-
-  //   const firstSlideToLastSlide = [images[0], images[lastIndex]]
-  //   const lastSlideToFirstSlide = [images[lastIndex], images[0]]
-
-  //   // Translate value here?
-  //   setState({
-  //     ...state,
-  //     images: [],
-  //     imagesCache: [...images]
-  //     // activeIndex === lastIndex
-  //     //   ? lastSlideToFirstSlide
-  //     //   : firstSlideToLastSlide
-  //   })
-  // }
-
-  /** handleDot */
-  const handleDot = index => {
-    setState({
-      ...state,
-      activeIndex: index,
-      translate: index * window.innerWidth
+      activeIndex: activeIndex - 1,
+      translate: prev
     })
   }
 
   return (
-    <StyledSlider>
-      <SliderContent translate={translate} slideWidth={slideWidth}>
-        {images.map(img => (
-          <img
-            key={img}
-            src={img}
-            css={css`
-              height: 100%;
-              width: 100%;
-            `}
-          />
+    <div
+      css={css`
+        position: relative;
+        height: 100vh;
+        width: 100vw;
+        margin: 0 auto;
+        overflow: hidden;
+        white-space: nowrap;
+        background: #333;
+      `}
+    >
+      <SliderContent
+        ref={contentRef}
+        translate={translate}
+        transition={transition}
+      >
+        {images.map((img, i) => (
+          <Slide key={img + i} img={img} />
         ))}
       </SliderContent>
 
       <Arrow direction="left" handleClick={prevSlide} />
       <Arrow direction="right" handleClick={nextSlide} />
 
-      <Dots>
-        {images.map((img, i) => (
-          <Dot
-            key={img}
-            active={i === activeIndex}
-            index={i}
-            handleDot={handleDot}
-          />
-        ))}
-      </Dots>
-    </StyledSlider>
+      <Dots images={props.images} />
+    </div>
   )
 }
 
