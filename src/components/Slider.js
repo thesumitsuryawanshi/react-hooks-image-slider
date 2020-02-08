@@ -8,44 +8,51 @@ import Dots from './Dots'
 
 /**
  * @function Slider
+ *
+ * - For reference, the slides variable always refers to props.slides. _slides, will always
+ *   refer to the internal variable set in state.
+ *
+ *  @todo
+ * - Handle resizing.
+ * - Instead of recreating the css event listener each time, perhaps it can be set once somehow.
  */
 const Slider = props => {
   const getWidth = () => window.innerWidth
   const contentRef = useRef()
 
+  const { slides } = props
+
   const [state, setState] = useState({
     activeIndex: 0,
     translate: getWidth(),
     transition: 0.45,
-    images: [
-      props.images[props.images.length - 1],
-      ...props.images,
-      props.images[0]
-    ]
+    _slides: [slides[slides.length - 1], ...slides, slides[0]]
   })
 
-  const { activeIndex, translate, images, transition } = state
+  const { activeIndex, translate, _slides, transition } = state
 
   /** smoothTransition */
   const smoothTransition = () => {
     if (activeIndex === 0 && translate > getWidth())
       return setState({ ...state, transition: 0, translate: getWidth() })
 
-    if (activeIndex === 0 && translate === 0) {
+    if (activeIndex === slides.length - 1 && translate === 0) {
       return setState({
         ...state,
         transition: 0,
-        translate: getWidth() * props.images.length - 1
+        translate: getWidth() * slides.length
       })
     }
   }
 
+  /** Listen for CSS transform transition. */
   useEffect(() => {
     contentRef.current.addEventListener('transitionend', smoothTransition)
     return () =>
       contentRef.current.removeEventListener('transitionend', smoothTransition)
   }, [activeIndex])
 
+  /** Reset transition once we have positioned the translate to it's proper value. */
   useEffect(() => {
     if (transition === 0) {
       setState({ ...state, transition: 0.45 })
@@ -56,7 +63,7 @@ const Slider = props => {
   const nextSlide = () => {
     const next = (activeIndex + 2) * getWidth()
 
-    if (activeIndex === props.images.length - 1) {
+    if (activeIndex === slides.length - 1) {
       return setState({
         ...state,
         activeIndex: 0,
@@ -78,7 +85,7 @@ const Slider = props => {
     if (activeIndex === 0) {
       return setState({
         ...state,
-        activeIndex: props.images.length - 1,
+        activeIndex: slides.length - 1,
         translate: prev
       })
     }
@@ -91,33 +98,33 @@ const Slider = props => {
   }
 
   return (
-    <div
-      css={css`
-        position: relative;
-        height: 100vh;
-        width: 100vw;
-        margin: 0 auto;
-        overflow: hidden;
-        white-space: nowrap;
-        background: #333;
-      `}
-    >
+    <div css={SliderCSS}>
       <SliderContent
         ref={contentRef}
         translate={translate}
         transition={transition}
+        width={getWidth() * _slides.length}
       >
-        {images.map((img, i) => (
-          <Slide key={img + i} img={img} />
+        {_slides.map((_slide, i) => (
+          <Slide key={_slide + i} content={_slide} images />
         ))}
       </SliderContent>
 
       <Arrow direction="left" handleClick={prevSlide} />
       <Arrow direction="right" handleClick={nextSlide} />
 
-      <Dots images={props.images} />
+      <Dots slides={slides} activeIndex={activeIndex} />
     </div>
   )
 }
+
+const SliderCSS = css`
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  margin: 0 auto;
+  overflow: hidden;
+  white-space: nowrap;
+`
 
 export default Slider

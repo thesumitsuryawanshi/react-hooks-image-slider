@@ -14,7 +14,7 @@ const Dot = ({ active }) => (
   />
 )
 
-const Dots = ({ images }) => (
+const Dots = ({ slides, activeIndex }) => (
   <div
     css={css`
       position: absolute;
@@ -25,8 +25,8 @@ const Dots = ({ images }) => (
       justify-content: center;
     `}
   >
-    {images.map(img => (
-      <Dot key={img} active={false} />
+    {slides.map((slide, i) => (
+      <Dot key={slide} active={activeIndex === i} />
     ))}
   </div>
 )
