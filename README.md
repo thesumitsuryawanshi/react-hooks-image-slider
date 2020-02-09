@@ -1,6 +1,8 @@
 # React Hooks Image Slider
 
-A React Hooks rebuild of the previous slider, which utilized class based components & redux. I put very large images in at full screen in the demo for dramatic effect. Just cycle through the slider once, and the images will cache, and won't give any white flicker. Enjoy!
+A React Hooks rebuild of the previous slider, which utilized class based components & redux. I put very large images in at full screen in the demo for dramatic effect. Just cycle through the slider once, and the images will cache, and won't give any white flicker. Plan on optimizing this very soon.
+
+Enjoy!
 
 ## Demo
 
