@@ -15,12 +15,12 @@ const Slide = ({ content, images }) => (
       // />
       <div
         css={css`
-      height: 100;
+      height: 100%;
       width: 100%;
       background-image: url('${content}');
       background-size: cover;
       background-repeat: no-repeat;
-      background-postion: center;
+      background-position: center;
     `}
       ></div>
     ) : (
