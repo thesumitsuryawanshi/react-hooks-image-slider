@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React, { memo } from 'react'
+import React from 'react'
 import { css, jsx } from '@emotion/core'
 import leftArrow from '../img/left-arrow.svg'
 import rightArrow from '../img/right-arrow.svg'
@@ -20,14 +20,11 @@ const Arrow = ({ direction, handleClick }) => (
       cursor: pointer;
       align-items: center;
       transition: transform ease-in 0.1s;
-
       &:hover {
         transform: scale(1.1);
       }
-
       img {
         transform: translateX(${direction === 'left' ? '-2' : '2'}px);
-
         &:focus {
           outline: 0;
         }
@@ -38,6 +35,4 @@ const Arrow = ({ direction, handleClick }) => (
   </div>
 )
 
-const MemoArrow = memo(Arrow)
-
-export default MemoArrow
+export default Arrow
