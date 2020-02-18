@@ -106,7 +106,7 @@ const Slider = props => {
         width={getWidth() * _slides.length}
       >
         {_slides.map((_slide, i) => (
-          <Slide key={_slide + i} content={_slide} images />
+          <Slide width={getWidth()} key={_slide + i} content={_slide} images />
         ))}
       </SliderContent>
 

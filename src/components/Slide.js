@@ -2,7 +2,7 @@
 import React, { memo } from 'react'
 import { css, jsx } from '@emotion/core'
 
-const Slide = ({ content, images }) => (
+const Slide = ({ content, images, width }) => (
   <>
     {images ? (
       // <img
@@ -16,7 +16,7 @@ const Slide = ({ content, images }) => (
       <div
         css={css`
       height: 100%;
-      width: 100%;
+      width: ${width}px;
       background-image: url('${content}');
       background-size: cover;
       background-repeat: no-repeat;
