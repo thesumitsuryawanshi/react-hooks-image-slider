@@ -9,4 +9,7 @@ const images = [
   'https://images.unsplash.com/photo-1534161308652-fdfcf10f62c4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2174&q=80'
 ]
 
-ReactDOM.render(<Slider slides={images} />, document.querySelector('.main'))
+ReactDOM.render(
+  <Slider slides={images} autoPlay={2} />,
+  document.querySelector('.main')
+)

@@ -6,19 +6,34 @@ import Slide from './Slide'
 import Arrow from './Arrow'
 import Dots from './Dots'
 
+const getWidth = () => window.innerWidth
+
 /**
  * @function Slider
  */
 const Slider = props => {
-  const getWidth = () => window.innerWidth
-
   const [state, setState] = useState({
     activeIndex: 0,
     translate: 0,
     transition: 0.45
   })
-
   const { translate, transition, activeIndex } = state
+  const autoPlayRef = useRef()
+
+  useEffect(() => {
+    autoPlayRef.current = nextSlide
+  })
+
+  useEffect(() => {
+    const play = () => {
+      autoPlayRef.current()
+    }
+
+    if (props.autoPlay !== null) {
+      const interval = setInterval(play, props.autoPlay * 1000)
+      return () => clearInterval(interval)
+    }
+  }, [props.autoPlay])
 
   const nextSlide = () => {
     if (activeIndex === props.slides.length - 1) {
@@ -64,12 +79,21 @@ const Slider = props => {
         ))}
       </SliderContent>
 
-      <Arrow direction="left" handleClick={prevSlide} />
-      <Arrow direction="right" handleClick={nextSlide} />
+      {!props.autoPlay && (
+        <>
+          <Arrow direction="left" handleClick={prevSlide} />
+          <Arrow direction="right" handleClick={nextSlide} />
+        </>
+      )}
 
       <Dots slides={props.slides} activeIndex={activeIndex} />
     </div>
   )
+}
+
+Slider.defaultProps = {
+  slides: [],
+  autoPlay: null
 }
 
 const SliderCSS = css`
