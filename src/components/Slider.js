@@ -6,32 +6,59 @@ import Slide from './Slide'
 import Arrow from './Arrow'
 import Dots from './Dots'
 
+const getWidth = () => window.innerWidth
+
 /**
  * @function Slider
- *
- * - For reference, the slides variable always refers to props.slides. _slides, will always
- *   refer to the internal variable set in state.
- *
- *  @todo
- * - Handle resizing.
- * - Instead of recreating the css event listener each time, perhaps it can be set once somehow.
  */
 const Slider = props => {
-  const getWidth = () => window.innerWidth
-  const contentRef = useRef()
-
   const { slides } = props
+  const firstSlide = slides[0]
+  const lastSlide = slides[slides.length - 1]
 
   const [state, setState] = useState({
     activeIndex: 0,
     translate: getWidth(),
     transition: 0.45,
-    _slides: [slides[slides.length - 1], ...slides, slides[0]]
+    _slides: [lastSlide, ...slides, firstSlide]
   })
 
   const { activeIndex, translate, _slides, transition } = state
+  const contentRef = useRef()
+  const resizeRef = useRef()
 
-  /** smoothTransition */
+  useEffect(() => {
+    contentRef.current = smoothTransition
+    resizeRef.current = handleResize
+  })
+
+  useEffect(() => {
+    const smooth = () => {
+      contentRef.current()
+    }
+
+    const resize = () => {
+      resizeRef.current()
+    }
+
+    const transitionEnd = window.addEventListener('transitionend', smooth)
+    const onResize = window.addEventListener('resize', resize)
+
+    return () => {
+      window.removeEventListener('transitionend', transitionEnd)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (transition === 0) setState({ ...state, transition: 0.45 })
+  }, [transition])
+
+  const handleResize = () => {
+    const translate = (activeIndex + 1) * getWidth()
+    setState({ ...state, translate, transition: 0 })
+  }
+
   const smoothTransition = () => {
     if (activeIndex === 0 && translate > getWidth())
       return setState({ ...state, transition: 0, translate: getWidth() })
@@ -45,54 +72,24 @@ const Slider = props => {
     }
   }
 
-  /** Listen for CSS transform transition. */
-  useEffect(() => {
-    contentRef.current.addEventListener('transitionend', smoothTransition)
-    return () =>
-      contentRef.current.removeEventListener('transitionend', smoothTransition)
-  }, [activeIndex])
-
-  /** Reset transition once we have positioned the translate to it's proper value. */
-  useEffect(() => {
-    if (transition === 0) {
-      setState({ ...state, transition: 0.45 })
-    }
-  }, [transition])
-
-  /** nextSlide */
   const nextSlide = () => {
     const next = (activeIndex + 2) * getWidth()
-
-    if (activeIndex === slides.length - 1) {
-      return setState({
-        ...state,
-        activeIndex: 0,
-        translate: next
-      })
-    }
+    const isLastSlide = activeIndex === slides.length - 1
 
     setState({
       ...state,
-      activeIndex: activeIndex + 1,
+      activeIndex: isLastSlide ? 0 : activeIndex + 1,
       translate: next
     })
   }
 
-  /** prevSlide */
   const prevSlide = () => {
     const prev = activeIndex * getWidth()
-
-    if (activeIndex === 0) {
-      return setState({
-        ...state,
-        activeIndex: slides.length - 1,
-        translate: prev
-      })
-    }
+    const isFirstSlide = activeIndex === 0
 
     setState({
       ...state,
-      activeIndex: activeIndex - 1,
+      activeIndex: isFirstSlide ? slides.length - 1 : activeIndex - 1,
       translate: prev
     })
   }
