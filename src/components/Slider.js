@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { css, jsx } from '@emotion/core'
 import SliderContent from './SliderContent'
 import Slide from './Slide'
@@ -72,7 +72,7 @@ const Slider = props => {
     }
   }
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     const next = (activeIndex + 2) * getWidth()
     const isLastSlide = activeIndex === slides.length - 1
 
@@ -81,9 +81,9 @@ const Slider = props => {
       activeIndex: isLastSlide ? 0 : activeIndex + 1,
       translate: next
     })
-  }
+  }, [activeIndex])
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     const prev = activeIndex * getWidth()
     const isFirstSlide = activeIndex === 0
 
@@ -92,7 +92,7 @@ const Slider = props => {
       activeIndex: isFirstSlide ? slides.length - 1 : activeIndex - 1,
       translate: prev
     })
-  }
+  }, [activeIndex])
 
   return (
     <div css={SliderCSS}>

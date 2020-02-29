@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React from 'react'
+import React, { memo } from 'react'
 import { css, jsx } from '@emotion/core'
 
 const Dot = ({ active }) => (
@@ -14,6 +14,8 @@ const Dot = ({ active }) => (
   />
 )
 
+const MemoDot = memo(Dot)
+
 const Dots = ({ slides, activeIndex }) => (
   <div
     css={css`
@@ -26,7 +28,7 @@ const Dots = ({ slides, activeIndex }) => (
     `}
   >
     {slides.map((slide, i) => (
-      <Dot key={slide} active={activeIndex === i} />
+      <MemoDot key={slide} active={activeIndex === i} />
     ))}
   </div>
 )
