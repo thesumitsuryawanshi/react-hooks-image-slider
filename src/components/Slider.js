@@ -13,28 +13,31 @@ const getWidth = () => window.innerWidth
  */
 const Slider = props => {
   const { slides } = props
+
   const firstSlide = slides[0]
+  const secondSlide = slides[1]
   const lastSlide = slides[slides.length - 1]
 
   const [state, setState] = useState({
-    activeIndex: 0,
+    activeSlide: 0,
     translate: getWidth(),
     transition: 0.45,
-    _slides: [lastSlide, ...slides, firstSlide]
+    _slides: [lastSlide, firstSlide, secondSlide]
   })
 
-  const { activeIndex, translate, _slides, transition } = state
-  const contentRef = useRef()
+  const { activeSlide, translate, _slides, transition } = state
+
+  const transitionRef = useRef()
   const resizeRef = useRef()
 
   useEffect(() => {
-    contentRef.current = smoothTransition
+    transitionRef.current = smoothTransition
     resizeRef.current = handleResize
   })
 
   useEffect(() => {
     const smooth = () => {
-      contentRef.current()
+      transitionRef.current()
     }
 
     const resize = () => {
@@ -55,49 +58,45 @@ const Slider = props => {
   }, [transition])
 
   const handleResize = () => {
-    const translate = (activeIndex + 1) * getWidth()
-    setState({ ...state, translate, transition: 0 })
+    setState({ ...state, translate: getWidth(), transition: 0 })
   }
 
   const smoothTransition = () => {
-    if (activeIndex === 0 && translate > getWidth())
-      return setState({ ...state, transition: 0, translate: getWidth() })
+    let _slides = []
 
-    if (activeIndex === slides.length - 1 && translate === 0) {
-      return setState({
-        ...state,
-        transition: 0,
-        translate: getWidth() * slides.length
-      })
-    }
+    // We're at the last slide.
+    if (activeSlide === slides.length - 1)
+      _slides = [slides[slides.length - 2], lastSlide, firstSlide]
+    // We're back at the first slide. Just reset to how it was on initial render
+    else if (activeSlide === 0) _slides = [lastSlide, firstSlide, secondSlide]
+    // Create an array of the previous last slide, and the next two slides that follow it.
+    else _slides = slides.slice(activeSlide - 1, activeSlide + 2)
+
+    setState({
+      ...state,
+      _slides,
+      transition: 0,
+      translate: getWidth()
+    })
   }
 
-  const nextSlide = useCallback(() => {
-    const next = (activeIndex + 2) * getWidth()
-    const isLastSlide = activeIndex === slides.length - 1
-
+  const nextSlide = () =>
     setState({
       ...state,
-      activeIndex: isLastSlide ? 0 : activeIndex + 1,
-      translate: next
+      translate: translate + getWidth(),
+      activeSlide: activeSlide === slides.length - 1 ? 0 : activeSlide + 1
     })
-  }, [activeIndex])
 
-  const prevSlide = useCallback(() => {
-    const prev = activeIndex * getWidth()
-    const isFirstSlide = activeIndex === 0
-
+  const prevSlide = () =>
     setState({
       ...state,
-      activeIndex: isFirstSlide ? slides.length - 1 : activeIndex - 1,
-      translate: prev
+      translate: 0,
+      activeSlide: activeSlide === 0 ? slides.length - 1 : activeSlide - 1
     })
-  }, [activeIndex])
 
   return (
     <div css={SliderCSS}>
       <SliderContent
-        ref={contentRef}
         translate={translate}
         transition={transition}
         width={getWidth() * _slides.length}
@@ -110,7 +109,7 @@ const Slider = props => {
       <Arrow direction="left" handleClick={prevSlide} />
       <Arrow direction="right" handleClick={nextSlide} />
 
-      <Dots slides={slides} activeIndex={activeIndex} />
+      <Dots slides={slides} activeSlide={activeSlide} />
     </div>
   )
 }
