@@ -9,9 +9,4 @@ A React Hooks rebuild of the previous slider, which utilized class based compone
 
 ## Demo
 
-[React Hooks Image Slider](https://dzuz14.github.io/react-hooks-image-slider/)
-
-## Medium Article & YouTube Videos
-If you are here from Medium or YouTube, I've separated each part into different branches, so you can view/run the code from that point in time.
-
-- [Part 1](https://github.com/DZuz14/react-hooks-image-slider/tree/part-1)
+Check the master branch for the demo.
