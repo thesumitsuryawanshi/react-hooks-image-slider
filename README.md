@@ -20,3 +20,4 @@ If you are here from Medium or YouTube, I've separated each part into different 
 
 - [Part 1](https://github.com/DZuz14/react-hooks-image-slider/tree/part-1)
 - [Part 2: Autoplay](https://github.com/DZuz14/react-hooks-image-slider/tree/part-2)
+- Part 3. There is no part 3 branch, the master branch is what we end up with at the end of the series.
