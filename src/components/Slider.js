@@ -12,6 +12,10 @@ const getWidth = () => window.innerWidth
  * @function Slider
  */
 const Slider = props => {
+  const autoPlayRef = useRef()
+  const transitionRef = useRef()
+  const resizeRef = useRef()
+
   const { slides } = props
 
   const firstSlide = slides[0]
@@ -27,21 +31,34 @@ const Slider = props => {
 
   const { activeSlide, translate, _slides, transition } = state
 
-  const autoPlayRef = useRef()
-  const transitionRef = useRef()
-  const resizeRef = useRef()
-
   useEffect(() => {
-    autoPlayRef.current = nextSlide
     transitionRef.current = smoothTransition
     resizeRef.current = handleResize
+    autoPlayRef.current = props.autoPlay ? nextSlide : null
   })
 
+  // Reactivate the transition that is removed in smoothTransition.
   useEffect(() => {
-    const play = () => {
-      autoPlayRef.current()
-    }
+    if (transition === 0) setState({ ...state, transition: 0.45 })
+  }, [transition])
 
+  // AutoPlay
+  useEffect(() => {
+    if (props.autoPlay) {
+      const play = () => {
+        autoPlayRef.current()
+      }
+
+      const interval = setInterval(play, props.autoPlay * 1000)
+
+      return () => {
+        clearInterval(interval)
+      }
+    }
+  }, [props.autoPlay])
+
+  // Smooth transitions and browser resizing.
+  useEffect(() => {
     const smooth = e => {
       if (e.target.className.includes('SliderContent')) {
         transitionRef.current()
@@ -55,25 +72,11 @@ const Slider = props => {
     const transitionEnd = window.addEventListener('transitionend', smooth)
     const onResize = window.addEventListener('resize', resize)
 
-    let interval = null
-
-    if (props.autoPlay) {
-      interval = setInterval(play, props.autoPlay * 1000)
-    }
-
     return () => {
       window.removeEventListener('transitionend', transitionEnd)
       window.removeEventListener('resize', onResize)
-
-      if (props.autoPlay) {
-        clearInterval(interval)
-      }
     }
   }, [])
-
-  useEffect(() => {
-    if (transition === 0) setState({ ...state, transition: 0.45 })
-  }, [transition])
 
   const handleResize = () => {
     setState({ ...state, translate: getWidth(), transition: 0 })
@@ -98,19 +101,31 @@ const Slider = props => {
     })
   }
 
-  const nextSlide = () =>
+  const hasAutoPlayBeenStopped = e => {
+    if (e && autoPlayRef.current && e.target.className.includes('Arrow')) {
+      props.stopAutoPlay()
+    }
+  }
+
+  const nextSlide = e => {
+    hasAutoPlayBeenStopped(e)
+
     setState({
       ...state,
       translate: translate + getWidth(),
       activeSlide: activeSlide === slides.length - 1 ? 0 : activeSlide + 1
     })
+  }
 
-  const prevSlide = () =>
+  const prevSlide = e => {
+    hasAutoPlayBeenStopped(e)
+
     setState({
       ...state,
       translate: 0,
       activeSlide: activeSlide === 0 ? slides.length - 1 : activeSlide - 1
     })
+  }
 
   return (
     <div css={SliderCSS}>
