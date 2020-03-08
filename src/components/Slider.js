@@ -104,6 +104,7 @@ const Slider = props => {
   const hasAutoPlayBeenStopped = e => {
     if (e && autoPlayRef.current && e.target.className.includes('Arrow')) {
       props.stopAutoPlay()
+      autoPlayRef.current = null
     }
   }
 

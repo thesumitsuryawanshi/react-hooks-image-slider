@@ -27,6 +27,7 @@ const Arrow = ({ direction, handleClick }) => (
 
       img {
         transform: translateX(${direction === 'left' ? '-2' : '2'}px);
+        pointer-events: none;
 
         &:focus {
           outline: 0;
