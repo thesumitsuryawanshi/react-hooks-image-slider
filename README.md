@@ -1,6 +1,8 @@
 # React Hooks Image Slider
 
-A React Hooks rebuild of the previous slider, which utilized class based components & redux. No matter how many slides are put into the slider as props, we only render three slides at a time, which dramatically reduces the amount of logic/math that we need to do. Simple.
+A React Hooks rebuild of the previous slider, which utilized class based components & redux. No matter how many slides are put into the slider as props, we only render three slides at a time, which dramatically reduces the amount of logic/math that we need to do. 
+
+Simple.
 
 ## Use
 
