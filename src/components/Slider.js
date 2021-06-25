@@ -22,20 +22,23 @@ const Slider = props => {
     activeSlide: 0,
     translate: getWidth(),
     transition: 0.45,
+    transitioning: false,
     _slides: [lastSlide, firstSlide, secondSlide]
   })
 
-  const { activeSlide, translate, _slides, transition } = state
+  const { activeSlide, translate, _slides, transition, transitioning } = state
 
   const autoPlayRef = useRef()
   const transitionRef = useRef()
   const resizeRef = useRef()
   const sliderRef = useRef()
+  const throttleRef = useRef()
 
   useEffect(() => {
     autoPlayRef.current = nextSlide
     transitionRef.current = smoothTransition
     resizeRef.current = handleResize
+    throttleRef.current = throttleArrows
   })
 
   useEffect(() => {
@@ -55,6 +58,11 @@ const Slider = props => {
       resizeRef.current()
     }
 
+    const throttle = () => {
+      throttleRef.current()
+    }
+
+    const transitionStart = slider.addEventListener('transitionstart', throttle)
     const transitionEnd = slider.addEventListener('transitionend', smooth)
     const onResize = window.addEventListener('resize', resize)
 
@@ -65,6 +73,7 @@ const Slider = props => {
     }
 
     return () => {
+      slider.removeEventListener('transitionend', transitionStart)
       slider.removeEventListener('transitionend', transitionEnd)
       window.removeEventListener('resize', onResize)
 
@@ -75,11 +84,35 @@ const Slider = props => {
   }, [])
 
   useEffect(() => {
-    if (transition === 0) setState({ ...state, transition: 0.45 })
+    if (transition === 0) setState({ ...state, transition: 0.45, transitioning: false })
   }, [transition])
+
+  const throttleArrows = () => {
+    setState({...state, transitioning: true })
+  } 
 
   const handleResize = () => {
     setState({ ...state, translate: getWidth(), transition: 0 })
+  }
+
+  const nextSlide = () => {
+    if(transitioning) return
+
+    setState({
+      ...state,
+      translate: translate + getWidth(),
+      activeSlide: activeSlide === slides.length - 1 ? 0 : activeSlide + 1
+    })
+  }
+
+  const prevSlide = () => {
+    if(transitioning) return
+
+    setState({
+      ...state,
+      translate: 0,
+      activeSlide: activeSlide === 0 ? slides.length - 1 : activeSlide - 1
+    })
   }
 
   const smoothTransition = () => {
@@ -100,20 +133,6 @@ const Slider = props => {
       translate: getWidth()
     })
   }
-
-  const nextSlide = () =>
-    setState({
-      ...state,
-      translate: translate + getWidth(),
-      activeSlide: activeSlide === slides.length - 1 ? 0 : activeSlide + 1
-    })
-
-  const prevSlide = () =>
-    setState({
-      ...state,
-      translate: 0,
-      activeSlide: activeSlide === 0 ? slides.length - 1 : activeSlide - 1
-    })
 
   return (
     <div css={SliderCSS} ref={sliderRef}>
