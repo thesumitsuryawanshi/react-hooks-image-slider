@@ -41,10 +41,6 @@ const Slider = props => {
   useEffect(() => {
     const slider = sliderRef.current
 
-    const play = () => {
-      autoPlayRef.current()
-    }
-
     const smooth = e => {
       if (e.target.className.includes('SliderContent')) {
         transitionRef.current()
@@ -58,21 +54,31 @@ const Slider = props => {
     const transitionEnd = slider.addEventListener('transitionend', smooth)
     const onResize = window.addEventListener('resize', resize)
 
-    let interval = null
-
-    if (props.autoPlay) {
-      interval = setInterval(play, props.autoPlay * 1000)
-    }
-
     return () => {
       slider.removeEventListener('transitionend', transitionEnd)
       window.removeEventListener('resize', onResize)
 
-      if (props.autoPlay) {
-        clearInterval(interval)
-      }
+    
     }
   }, [])
+
+  useEffect(() => {
+    const play = () => {
+        autoPlayRef.current();
+    }
+  
+    let interval = null
+    
+    if (props.autoPlay) {
+        interval = setInterval(play, props.autoPlay * 1000);
+    }
+    
+    return () => {
+        if (props.autoPlay) {
+            clearInterval(interval);
+        }
+    };
+  }, [activeSlide])
 
   useEffect(() => {
     if (transition === 0) setState({ ...state, transition: 0.45 })
