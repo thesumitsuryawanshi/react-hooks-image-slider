@@ -54,8 +54,10 @@ const Slider = props => {
       resizeRef.current()
     }
 
-    const throttle = () => {
-      throttleRef.current()
+    const throttle = e => {
+      if (e.target.className.includes('SliderContent')) {
+        throttleRef.current()
+      }
     }
 
     const transitionStart = slider.addEventListener('transitionstart', throttle)
@@ -66,8 +68,6 @@ const Slider = props => {
       slider.removeEventListener('transitionend', transitionStart)
       slider.removeEventListener('transitionend', transitionEnd)
       window.removeEventListener('resize', onResize)
-
-    
     }
   }, [])
 
