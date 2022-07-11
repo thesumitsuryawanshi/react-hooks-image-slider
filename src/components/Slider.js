@@ -60,14 +60,14 @@ const Slider = props => {
       }
     }
 
-    const transitionStart = slider.addEventListener('transitionstart', throttle)
-    const transitionEnd = slider.addEventListener('transitionend', smooth)
-    const onResize = window.addEventListener('resize', resize)
+    slider.addEventListener('transitionstart', throttle)
+    slider.addEventListener('transitionend', smooth)
+    window.addEventListener('resize', resize)
 
     return () => {
-      slider.removeEventListener('transitionstart', transitionStart)
-      slider.removeEventListener('transitionend', transitionEnd)
-      window.removeEventListener('resize', onResize)
+      slider.removeEventListener('transitionstart', throttle)
+      slider.removeEventListener('transitionend', smooth)
+      window.removeEventListener('resize', resize)
     }
   }, [])
 
