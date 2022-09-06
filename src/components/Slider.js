@@ -60,14 +60,14 @@ const Slider = props => {
       }
     }
 
-    const transitionStart = slider.addEventListener('transitionstart', throttle)
-    const transitionEnd = slider.addEventListener('transitionend', smooth)
-    const onResize = window.addEventListener('resize', resize)
+    slider.addEventListener('transitionstart', throttle)
+    slider.addEventListener('transitionend', smooth)
+    window.addEventListener('resize', resize)
 
     return () => {
-      slider.removeEventListener('transitionend', transitionStart)
-      slider.removeEventListener('transitionend', transitionEnd)
-      window.removeEventListener('resize', onResize)
+      slider.removeEventListener('transitionstart', throttle)
+      slider.removeEventListener('transitionend', smooth)
+      window.removeEventListener('resize', resize)
     }
   }, [])
 
@@ -75,13 +75,13 @@ const Slider = props => {
     const play = () => {
         autoPlayRef.current();
     }
-  
+
     let interval = null
-    
+
     if (props.autoPlay) {
         interval = setInterval(play, props.autoPlay * 1000);
     }
-    
+
     return () => {
         if (props.autoPlay) {
             clearInterval(interval);
@@ -95,7 +95,7 @@ const Slider = props => {
 
   const throttleArrows = () => {
     setState({...state, transitioning: true })
-  } 
+  }
 
   const handleResize = () => {
     setState({ ...state, translate: getWidth(), transition: 0 })
